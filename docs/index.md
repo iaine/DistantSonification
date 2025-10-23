@@ -1,1 +1,3 @@
-Welcome to Distant Sonification
+This is a website based on my PhD thesis work. 
+
+[Work in Progress](wip){ .md-button .md-button--primary }
