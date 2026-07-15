@@ -1,5 +1,7 @@
-This is a website based on my PhD thesis work, which is currently being turned into a book. 
+This is a website based on my PhD thesis work. This will be a book in due course. 
 
-[Timelines](timeline){ .md-button }
+[Timeline](timeline){ .md-button }
 
-[Work in Progress](wip){ .md-button }
+[Workshop](dhoxss){ .md-button }
+
+[Sonic Languages](soniclang.md){ .md-button }
