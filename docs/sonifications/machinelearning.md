@@ -6,7 +6,7 @@ This sonification divides the tensor by columns and then items in that column.
 
 ![type:audio](./assets/StereoChannelItem.wav)
 
-This sonification divides the tensor by itsm and then channels in that column. 
+This sonification divides the tensor by item and then channels in that column. 
 
 ![type:audio](./assets/StereoItemChannel.wav)
 
