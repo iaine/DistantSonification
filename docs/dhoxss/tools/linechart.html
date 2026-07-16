@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/sonification.js"></script>
+<script src="https://code.highcharts.com/modules/accessibility.js"></script>
+
+    </head>
+    <body>
+        <figure class="highcharts-figure">
+        <button id="sonify">Play chart</button>
+        <div id="container"></div>
+        <p class="highcharts-description">This chart's series are sonified in sequence.</p>
+        </figure>
+<script>
+const chart = Highcharts.chart('container', {
+    title: {
+        text: 'Audio chart'
+    },
+    series: [{
+        data: [4, 5, 6, 5, 7, 9, 11, 13]
+    }, {
+        data: [1, 3, 4, 2]
+    }]
+});
+
+document.getElementById('sonify').onclick = () => chart.toggleSonify();
+</script>
+
+    </body>
+</html>
