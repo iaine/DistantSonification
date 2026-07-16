@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>I. Timeline &amp; Tone — Sonic Register</title>
+<link rel="stylesheet" href="../shared/style.css">
+<script src="https://code.highcharts.com/highcharts.js"></script>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="eyebrow">Digital Humanities Oxford Summer School &middot; STC / EEBO-TCP catalogue</div>
+  <h1>The Sonic Register</h1>
+  <p class="lede">Every year in the catalogue becomes a note.</p>
+  <nav>
+    <a href="../index.html">Index</a>
+    <a href="../timeline/index.html" class="current">I. Timeline</a>
+    <a href="../map/index.html">II. Distance</a>
+    <a href="../tags/index.html">III. Terms</a>
+  </nav>
+</header>
+
+<div class="card">
+  <div class="card-tab"><span><span class="tag-no">No. I</span> — Timeline &amp; Tone</span><span>date → year · count / pages → pitch</span></div>
+  <div class="card-inner">
+
+    <h2 class="tool-title">Timeline &amp; Tone</h2>
+    <p class="tool-desc">Records are grouped by publication year. Playback steps
+      through the years in order; each year sounds a single tone, its pitch
+      set by either the number of editions printed that year or the total
+      page count — a rising note means a busier year at the press.</p>
+
+    <div id="err" class="errbox hidden"></div>
+
+    <div class="upload-well" id="dropZone">
+      <div class="u-left">
+        <div class="u-icon">＋</div>
+        <div class="u-text">
+          <div class="u-title">Upload a catalogue CSV</div>
+          <div class="u-sub">Needs a <em>Date</em> column (and ideally <em>Pages</em>) &middot; drag &amp; drop or browse</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn ghost" id="sampleBtn">Load sample (STC/EEBO, 199 records)</button>
+        <button class="btn" id="browseBtn">Browse file…</button>
+        <input type="file" id="fileInput" accept=".csv,text/csv">
+      </div>
+    </div>
+
+    <div class="meta-strip hidden" id="metaStrip"></div>
+
+    <div class="controls hidden" id="controls">
+      <div class="field">
+        <label for="metricSel">Sonify &amp; chart by</label>
+        <select id="metricSel">
+          <option value="count">Number of items</option>
+          <option value="pages">Total pages</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="waveSel">Waveform</label>
+        <select id="waveSel">
+          <option value="triangle">Triangle</option>
+          <option value="sine">Sine</option>
+          <option value="sawtooth">Sawtooth</option>
+          <option value="square">Square</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="curveSel">Pitch curve</label>
+        <select id="curveSel">
+          <option value="log">Logarithmic (recommended)</option>
+          <option value="linear">Linear</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="tempoRange">Tempo — <span class="val" id="tempoVal">110 ms / year</span></label>
+        <input type="range" id="tempoRange" min="30" max="400" step="5" value="110">
+      </div>
+      <div class="field">
+        <label for="minFreq">Lowest note (Hz)</label>
+        <input type="number" id="minFreq" value="110" min="40" max="2000">
+      </div>
+      <div class="field">
+        <label for="maxFreq">Highest note (Hz)</label>
+        <input type="number" id="maxFreq" value="1046" min="40" max="4000">
+      </div>
+    </div>
+
+    <div class="chart-wrap hidden" id="chartWrap">
+      <div id="chart" style="height:380px;"></div>
+    </div>
+
+    <div class="transport hidden" id="transport">
+      <div class="btn-row">
+        <button class="btn" id="playBtn">▶ Play</button>
+        <button class="btn ghost" id="stopBtn">■ Stop</button>
+      </div>
+      <div class="needle-strip" id="needleStrip"><div class="needle" id="needle" style="left:0%"></div></div>
+      <div class="hint" id="playPos">—</div>
+    </div>
+
+    <p class="hint" id="clickHint"></p>
+
+  </div>
+</div>
+
+<footer class="byline">Sonic Register — I. Timeline &amp; Tone</footer>
+
+<script src="../shared/sample-data.js"></script>
+<script src="../shared/common.js"></script>
+<script src="timeline.js"></script>
+</body>
+</html>
