@@ -48,3 +48,7 @@ The above is only the code.
 Hatnote, [Listen to Wikipedia](http://listen.hatnote.com/)
 
 Loud Numbers, [https://www.loudnumbers.net/](https://www.loudnumbers.net/)
+
+## Design Tools
+
+Lenzi S., Ciuccarelli P., Liu H., Hua Y. 2020. Data Sonification Archive. http://www.sonification.design.
