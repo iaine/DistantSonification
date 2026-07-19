@@ -1,8 +1,8 @@
 (function () {
   const engine = new SonifyEngine();
 
-  // Built-in gazetteer. Norm key = lowercased/trimmed place name.
-  // London & Norfolk coordinates as specified by the project brief.
+  // Built-in gazetteer — only used as a fallback when the uploaded file has
+  // no Latitude/Longitude columns of its own. Norm key = lowercased place name.
   const GAZETTEER = {
     'oxford':    { lat: 51.7520, lon: -1.2577 },
     'london':    { lat: 51.5075, lon: 0.1275 },
@@ -19,15 +19,18 @@
   const els = {};
   ['dropZone','fileInput','browseBtn','sampleBtn','err','metaStrip','setupZone',
    'refName','refLat','refLon','presetOxford','presetLondon','presetNorfolk','useGeo',
-   'placesHint','placeTableBody','buildBtn','chartWrap','controls','transport',
+   'placesHint','placeTable','placeTableBody','buildBtn','chartWrap','controls','transport',
    'metricSel','waveSel','volModeSel','tempoRange','tempoVal','minFreq','maxFreq',
    'playBtn','stopBtn','needle','playPos'
   ].forEach(id => els[id] = document.getElementById(id));
 
   let records = [];
-  let dateField = null, placeField = null, pagesField = null;
-  let placeCounts = new Map();     // place -> count
-  let placeCoords = new Map();     // normalized place -> {lat,lon}
+  let dateField = null, placeField = null, pagesField = null, latField = null, lonField = null;
+  let usingCoords = false;         // true when the file supplies its own Latitude/Longitude
+  let placeCounts = new Map();     // place label -> count (gazetteer-mode only)
+  let placeCoords = new Map();     // normalized place -> {lat,lon,label} (gazetteer-mode only)
+  let resolved = [];               // per-record: {r, lat, lon} or {r, lat:null, lon:null}
+  let excludedCount = 0;
   let years = [];                  // aggregated per year
   let mapTopology = null;
   let mapChart = null;
@@ -59,19 +62,32 @@
   els.playBtn.addEventListener('click', play);
   els.stopBtn.addEventListener('click', stop);
 
+  function toFloat(v) {
+    if (v === undefined || v === null || String(v).trim() === '') return null;
+    const n = parseFloat(v);
+    return isNaN(n) ? null : n;
+  }
+
   function onData(recs, meta) {
     clearError(els.err);
     if (!recs.length) { showError(els.err, 'No rows found in that file.'); return; }
     dateField = findField(recs[0], 'date');
     placeField = findField(recs[0], 'place');
     pagesField = findField(recs[0], 'pages');
+    latField = findField(recs[0], 'latitude');
+    lonField = findField(recs[0], 'longitude');
+    usingCoords = !!(latField && lonField);
+
     if (!dateField) { showError(els.err, 'Could not find a Date column in this file.'); return; }
-    if (!placeField) { showError(els.err, 'Could not find a Place column in this file.'); return; }
+    if (!usingCoords && !placeField) {
+      showError(els.err, 'Could not find Latitude/Longitude columns, or a Place column to fall back on.');
+      return;
+    }
 
     records = recs;
     placeCounts = new Map();
     records.forEach(r => {
-      const p = (r[placeField] || '').trim() || '(unspecified)';
+      const p = (placeField ? (r[placeField] || '').trim() : '') || '(unspecified)';
       placeCounts.set(p, (placeCounts.get(p) || 0) + 1);
     });
 
@@ -79,9 +95,10 @@
     els.metaStrip.innerHTML =
       `<span><b>${meta.filename}</b></span>` +
       `<span>${records.length} records</span>` +
-      `<span>${placeCounts.size} distinct places</span>`;
+      `<span>${usingCoords ? 'Located via Latitude / Longitude columns' : (placeCounts.size + ' distinct places')}</span>`;
 
-    buildPlaceTable();
+    if (usingCoords) buildCoordSummary(); else buildPlaceTable();
+
     els.setupZone.classList.remove('hidden');
     els.chartWrap.classList.add('hidden');
     els.controls.classList.add('hidden');
@@ -89,7 +106,45 @@
     stop();
   }
 
+  /* -- coordinate-column mode: read-only summary of each record's own lat/lon -- */
+  function buildCoordSummary() {
+    els.placeTable.classList.add('readonly-table');
+    let invalid = 0;
+    const clusters = new Map(); // rounded "lat,lon" -> {lat,lon,labels:Set,count}
+    records.forEach(r => {
+      const lat = toFloat(r[latField]), lon = toFloat(r[lonField]);
+      const ok = lat !== null && lon !== null && Math.abs(lat) <= 90 && Math.abs(lon) <= 180;
+      if (!ok) { invalid++; return; }
+      const key = lat.toFixed(3) + ',' + lon.toFixed(3);
+      if (!clusters.has(key)) clusters.set(key, { lat, lon, labels: new Set(), count: 0 });
+      const c = clusters.get(key);
+      c.count += 1;
+      if (placeField) c.labels.add((r[placeField] || '').trim() || '(unspecified)');
+    });
+
+    const sorted = Array.from(clusters.values()).sort((a, b) => b.count - a.count);
+    els.placeTableBody.innerHTML = '';
+    sorted.forEach(c => {
+      const tr = document.createElement('tr');
+      const label = c.labels.size ? Array.from(c.labels).join(', ') : '—';
+      tr.innerHTML = `
+        <td>${escapeHtml(label)}</td>
+        <td>${c.count}</td>
+        <td>${c.lat.toFixed(4)}</td>
+        <td>${c.lon.toFixed(4)}</td>
+        <td class="resolved">from Latitude/Longitude columns</td>
+      `;
+      els.placeTableBody.appendChild(tr);
+    });
+
+    els.placesHint.textContent = invalid
+      ? `${clusters.size} distinct coordinate location(s) read straight from the file's Latitude/Longitude columns — ${invalid} record(s) have missing or invalid coordinates and will be excluded.`
+      : `${clusters.size} distinct coordinate location(s) read straight from the file's Latitude/Longitude columns. Each record uses its own coordinates, even where the Place name repeats.`;
+  }
+
+  /* -- fallback mode: editable gazetteer table keyed by place name -- */
   function buildPlaceTable() {
+    els.placeTable.classList.remove('readonly-table');
     els.placeTableBody.innerHTML = '';
     let unresolvedCount = 0;
     const sorted = Array.from(placeCounts.entries()).sort((a, b) => b[1] - a[1]);
@@ -108,35 +163,62 @@
       tr.dataset.place = place;
       els.placeTableBody.appendChild(tr);
     });
-    els.placesHint.textContent = unresolvedCount
-      ? `Places found in this file — ${unresolvedCount} need coordinates before building (London & Norfolk are pre-filled; add others as needed).`
-      : `Places found in this file — all resolved from the built-in gazetteer. Edit any row to override.`;
+    els.placesHint.textContent = `No Latitude/Longitude columns found in this file — falling back to place names. ` +
+      (unresolvedCount
+        ? `${unresolvedCount} place(s) need coordinates before building (London & Norfolk are pre-filled; add others as needed).`
+        : `All places resolved from the built-in gazetteer. Edit any row to override.`);
   }
 
-  function escapeHtml(s) { return s.replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function escapeHtml(s) { return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+  /* -- resolve a lat/lon for every record, in whichever mode is active -- */
+  function resolveRecords() {
+    const out = [];
+    let excluded = 0;
+    records.forEach(r => {
+      let lat = null, lon = null;
+      if (usingCoords) {
+        const la = toFloat(r[latField]), lo = toFloat(r[lonField]);
+        if (la !== null && lo !== null && Math.abs(la) <= 90 && Math.abs(lo) <= 180) { lat = la; lon = lo; }
+      } else {
+        const place = (placeField ? (r[placeField] || '').trim() : '') || '(unspecified)';
+        const coord = placeCoords.get(place.toLowerCase());
+        if (coord) { lat = coord.lat; lon = coord.lon; }
+      }
+      if (lat === null || lon === null) { excluded++; out.push({ r, lat: null, lon: null }); return; }
+      out.push({ r, lat, lon });
+    });
+    return { out, excluded };
+  }
 
   async function build() {
     clearError(els.err);
-    // read place coords from table
-    placeCoords = new Map();
-    const rows = els.placeTableBody.querySelectorAll('tr');
-    let missing = [];
-    rows.forEach(tr => {
-      const place = tr.dataset.place;
-      const lat = parseFloat(tr.querySelector('.lat-in').value);
-      const lon = parseFloat(tr.querySelector('.lon-in').value);
-      if (isNaN(lat) || isNaN(lon)) { missing.push(place); return; }
-      placeCoords.set(place.toLowerCase(), { lat, lon, label: place });
-    });
-    if (missing.length) {
-      showError(els.err, `Missing coordinates for: ${missing.join(', ')}. Fill these in or they will be excluded.`);
+
+    if (!usingCoords) {
+      // read gazetteer-mode coordinates from the editable table
+      placeCoords = new Map();
+      const rows = els.placeTableBody.querySelectorAll('tr');
+      let missing = [];
+      rows.forEach(tr => {
+        const place = tr.dataset.place;
+        const lat = parseFloat(tr.querySelector('.lat-in').value);
+        const lon = parseFloat(tr.querySelector('.lon-in').value);
+        if (isNaN(lat) || isNaN(lon)) { missing.push(place); return; }
+        placeCoords.set(place.toLowerCase(), { lat, lon, label: place });
+      });
+      if (missing.length) {
+        showError(els.err, `Missing coordinates for: ${missing.join(', ')}. Fill these in or they will be excluded.`);
+      }
     }
 
     const refLat = parseFloat(els.refLat.value), refLon = parseFloat(els.refLon.value);
     if (isNaN(refLat) || isNaN(refLon)) { showError(els.err, 'Reference latitude/longitude must be numbers.'); return; }
 
+    const { out, excluded } = resolveRecords();
+    resolved = out;
+    excludedCount = excluded;
     years = aggregateByYear(refLat, refLon);
-    if (!years.length) { showError(els.err, 'No records could be located — check the place coordinates above.'); return; }
+    if (!years.length) { showError(els.err, 'No records could be located — check the coordinates above.'); return; }
 
     els.buildBtn.textContent = 'Loading map…';
     els.buildBtn.disabled = true;
@@ -155,24 +237,27 @@
     els.controls.classList.remove('hidden');
     els.transport.classList.remove('hidden');
     renderMap();
+
+    if (excludedCount) {
+      showError(els.err, `${excludedCount} of ${records.length} record(s) excluded from the map/sonification — missing or invalid coordinates.`);
+    }
   }
 
   function aggregateByYear(refLat, refLon) {
     const map = new Map();
-    records.forEach(r => {
+    resolved.forEach(({ r, lat, lon }) => {
+      if (lat === null || lon === null) return;
       const y = extractYear(r[dateField]);
       if (y === null) return;
-      const place = (r[placeField] || '').trim() || '(unspecified)';
-      const coord = placeCoords.get(place.toLowerCase());
-      if (!coord) return; // excluded — no coordinates
+      const place = (placeField ? (r[placeField] || '').trim() : '') || '(unspecified)';
       const p = pagesField ? (parseInt(String(r[pagesField]).replace(/[^\d]/g, ''), 10) || 0) : 0;
       if (!map.has(y)) map.set(y, { year: y, count: 0, pages: 0, distSum: 0, lonSum: 0, places: {} });
       const e = map.get(y);
-      const dist = haversineKm(refLat, refLon, coord.lat, coord.lon);
+      const dist = haversineKm(refLat, refLon, lat, lon);
       e.count += 1;
       e.pages += p;
       e.distSum += dist;
-      e.lonSum += coord.lon;
+      e.lonSum += lon;
       e.places[place] = (e.places[place] || 0) + 1;
     });
     return Array.from(map.values()).map(e => ({
@@ -182,14 +267,28 @@
     })).sort((a, b) => a.year - b.year);
   }
 
+  function currentPlacePoints() {
+    // group resolved, located records into map markers by rounded coordinate
+    const clusters = new Map();
+    resolved.forEach(({ r, lat, lon }) => {
+      if (lat === null || lon === null) return;
+      const key = lat.toFixed(3) + ',' + lon.toFixed(3);
+      if (!clusters.has(key)) clusters.set(key, { lat, lon, labels: new Set(), count: 0 });
+      const c = clusters.get(key);
+      c.count += 1;
+      if (placeField) c.labels.add((r[placeField] || '').trim() || '(unspecified)');
+    });
+    return Array.from(clusters.values()).map(c => ({
+      name: c.labels.size ? Array.from(c.labels).join(' / ') : `${c.lat.toFixed(2)}, ${c.lon.toFixed(2)}`,
+      lat: c.lat, lon: c.lon, z: c.count,
+    }));
+  }
+
   function renderMap() {
     const refName = els.refName.value || 'Reference';
     const refLat = parseFloat(els.refLat.value), refLon = parseFloat(els.refLon.value);
 
-    const placePoints = Array.from(placeCoords.entries()).map(([key, c]) => {
-      const count = placeCounts.get(c.label) || 0;
-      return { name: c.label, lat: c.lat, lon: c.lon, z: count };
-    });
+    const placePoints = currentPlacePoints();
     const counts = placePoints.map(p => p.z);
     const cMin = Math.min(...counts), cMax = Math.max(...counts);
     placePoints.forEach(p => {

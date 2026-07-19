@@ -13,6 +13,7 @@
   .ref-row .field{ max-width: 160px; }
   .unresolved{ color: var(--red); }
   .resolved{ color: var(--ink-soft); }
+  .readonly-table input{ display:none; }
 </style>
 </head>
 <body>
@@ -35,11 +36,13 @@
 
     <h2 class="tool-title">Distance from Home</h2>
     <p class="tool-desc">Places of publication are plotted on a map of
-      Britain. Playback again steps chronologically through the years, one
-      tone per year — but now the volume of each tone falls away with how
-      far that year's average place of publication sat from a reference
-      point you choose. Pitch still follows the number of items or pages,
-      as on the timeline.</p>
+      Britain, located from each record's own <em>Latitude</em> /
+      <em>Longitude</em> columns where the file provides them (falling back
+      to a built-in gazetteer of place names otherwise). Playback steps
+      chronologically through the years, one tone per year — but now the
+      volume of each tone falls away with how far that year's records sat,
+      on average, from a reference point you choose. Pitch still follows
+      the number of items or pages, as on the timeline.</p>
 
     <div id="err" class="errbox hidden"></div>
 
@@ -48,7 +51,7 @@
         <div class="u-icon">＋</div>
         <div class="u-text">
           <div class="u-title">Upload a catalogue CSV</div>
-          <div class="u-sub">Needs <em>Date</em> and <em>Place</em> columns &middot; drag &amp; drop or browse</div>
+          <div class="u-sub">Needs a <em>Date</em> column, plus <em>Latitude</em>/<em>Longitude</em> (preferred) or a <em>Place</em> column &middot; drag &amp; drop or browse</div>
         </div>
       </div>
       <div class="btn-row">

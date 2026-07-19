@@ -69,6 +69,8 @@ const FIELD_ALIASES = {
   terms: ['Terms', 'Tags', 'Subjects', 'Subject Terms'],
   title: ['Title'],
   author:['Author'],
+  latitude:  ['Latitude', 'Lat'],
+  longitude: ['Longitude', 'Lon', 'Lng', 'Long'],
 };
 
 function findField(record, key) {
