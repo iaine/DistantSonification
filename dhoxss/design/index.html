@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        
+        
+        
+        <link rel="shortcut icon" href="../../img/favicon.ico">
+        <title>Design - Distant Sonification</title>
+        <link href="../../css/bootstrap.min.css" rel="stylesheet">
+        <link href="../../css/fontawesome.min.css" rel="stylesheet">
+        <link href="../../css/brands.min.css" rel="stylesheet">
+        <link href="../../css/solid.min.css" rel="stylesheet">
+        <link href="../../css/v4-font-face.min.css" rel="stylesheet">
+        <link href="../../css/base.css" rel="stylesheet">
+        <link id="hljs-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github.min.css" >
+        <link id="hljs-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css" disabled>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+        <script>hljs.highlightAll();</script> 
+    </head>
+
+    <body>
+        <div class="navbar fixed-top navbar-expand-lg navbar-dark bg-primary">
+            <div class="container">
+                <a class="navbar-brand" href="../..">Distant Sonification</a>
+                <!-- Expander button -->
+                <button type="button" class="navbar-toggler" data-bs-toggle="collapse" data-bs-target="#navbar-collapse" aria-controls="navbar-collapse" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+
+                <!-- Expanded navigation -->
+                <div id="navbar-collapse" class="navbar-collapse collapse">
+                        <!-- Main navigation -->
+                        <ul class="nav navbar-nav">
+                            <li class="nav-item">
+                                <a href="../.." class="nav-link">Home</a>
+                            </li>
+                            <li class="nav-item">
+                                <a href="../../soniclang/" class="nav-link">Soniclang</a>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle active" aria-current="page" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Dhoxss</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../" class="dropdown-item">Index</a>
+</li>
+                                    
+<li>
+    <a href="./" class="dropdown-item active" aria-current="page">Design</a>
+</li>
+                                    
+<li>
+    <a href="../exercise/" class="dropdown-item">Exercise</a>
+</li>
+                                    
+<li>
+    <a href="../listening/" class="dropdown-item">Listening</a>
+</li>
+                                    
+<li>
+    <a href="../resources/" class="dropdown-item">Resources</a>
+</li>
+                                    
+<li>
+    <a href="../sonification/" class="dropdown-item">Sonification</a>
+</li>
+                                    
+<li>
+    <a href="../tools/" class="dropdown-item">Tools</a>
+</li>
+                                </ul>
+                            </li>
+                            <li class="nav-item dropdown">
+                                <a href="#" class="nav-link dropdown-toggle" role="button" data-bs-toggle="dropdown"  aria-expanded="false">Sonifications</a>
+                                <ul class="dropdown-menu">
+                                    
+<li>
+    <a href="../../sonifications/machinelearning/" class="dropdown-item">Machinelearning</a>
+</li>
+                                    
+<li>
+    <a href="../../sonifications/networks/" class="dropdown-item">Networks</a>
+</li>
+                                    
+<li>
+    <a href="../../sonifications/timeline/" class="dropdown-item">Timeline</a>
+</li>
+                                </ul>
+                            </li>
+                        </ul>
+
+                    <ul class="nav navbar-nav ms-md-auto">
+                            <li class="nav-item">
+                                <a rel="prev" href="../" class="nav-link">
+                                    <i class="fa fa-arrow-left"></i> Previous
+                                </a>
+                            </li>
+                            <li class="nav-item">
+                                <a rel="next" href="../exercise/" class="nav-link">
+                                    Next <i class="fa fa-arrow-right"></i>
+                                </a>
+                            </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <div class="container">
+            <div class="row">
+                    <div class="col-md-3"><div class="navbar-expand-md bs-sidebar hidden-print affix" role="complementary">
+    <div class="navbar-header">
+        <button type="button" class="navbar-toggler collapsed" data-bs-toggle="collapse" data-bs-target="#toc-collapse" title="Table of Contents">
+            <span class="fa fa-angle-down"></span>
+        </button>
+    </div>
+
+    
+    <div id="toc-collapse" class="navbar-collapse collapse card bg-body-tertiary">
+        <ul class="nav flex-column">
+            
+            <li class="nav-item" data-bs-level="2"><a href="#design" class="nav-link">Design</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-bs-level="2"><a href="#mapping-data-to-sound" class="nav-link">Mapping Data to Sound</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+            
+            <li class="nav-item" data-bs-level="2"><a href="#bibliography" class="nav-link">Bibliography</a>
+              <ul class="nav flex-column">
+              </ul>
+            </li>
+        </ul>
+    </div>
+</div></div>
+                    <div class="col-md-9" role="main">
+
+<div><h2 id="design">Design</h2>
+<p>The introduction mentions two approaches to sonification, as well as two closely associated fields. Sonification, like web science, is an interdisciplinary field. </p>
+<h3 id="basic-designs">Basic Designs</h3>
+<p>At a basic level, sonification design might look at:</p>
+<ul>
+<li>volume, </li>
+<li>pitch, </li>
+<li>tempo or beat, </li>
+<li>direction (panning or spatial?)</li>
+</ul>
+<p>or a combination of the above. </p>
+<p>Here you might think about the type of data to be sonified and the approaches, such as qualitative - such as categories - or quantitative - like discrete numbers or continuous values like time series. </p>
+<h2 id="mapping-data-to-sound">Mapping Data to Sound</h2>
+<p>Once you have considered the above questions and thought what you are want to sonify, then you need to think about how the data is to be mapped to a sound. </p>
+<p>One way may be to assign a value to a note. A simple example might be the DNA sequence which is ACGT. </p>
+<p>You might make use of cyphers if you want to want to encypher the data, such as the Haydn cipher. (If this is of interest, listen to Olivier Messiaens' music.)</p>
+<p>You might think about other approaches like earcons, audicons, or even samples. Here you are using more complex sounds and beginning to interpret sounds.  </p>
+<p>What approaches might be useful in web science? </p>
+<p>Is this only temporal? Are there other relationships?</p>
+<p>In an earlier workshop paper, myself and a co-author measured the packets on varying devices to think about how they work with the network (Emsley &amp; Chamberlain, 2021).</p>
+<h3 id="how-might-we-want-to-present-data">How might we want to present data?</h3>
+<p>We could use audio graphs, such as line charts to show relationships over time (Emsley, De Roure and Chamberlain, A, 2017).</p>
+<p>You can also think about more in depth sounds, such as using noise for sonifications of networks (Emsley, De Roure and Chamberlain, A, 2017). </p>
+<p>Another way is to create layers of sound to contextualise data. In the UnheardCity work, sonifications of the data were overlaid with sound recordings to provide some context from the walk.</p>
+<p><a href="https://unheardcity.org.uk/sounds/soundscape.html">https://unheardcity.org.uk/sounds/soundscape.html</a></p>
+<h3 id="exercise">Exercise</h3>
+<p>In this workshop, we will take the use the design mapping sheet (Ciuccarelli and Lenzi, 2020) and apply it to some data to work to design a sonification. It might be useful to apply some of the considerations from the <a href="listening">listening</a> session to think about the potential effect of the audio representation. </p>
+<p>Other approaches are listed in the bibliography.</p>
+<h3 id="tools">Tools</h3>
+<p>You may want to use your own tools, if you have some. If not, <a href="https://twotone.io">TwoTone</a> is a good starting point for experimenting and is available online. </p>
+<h2 id="bibliography">Bibliography</h2>
+<p>Axon, L., Goldsmith, M. and Creese, S., 2018. Sonification mappings: estimating effectiveness, polarities and scaling in an online experiment. Journal of the Audio Engineering Society, 66(12), pp.1016-1032.</p>
+<p>Campo, A.D., Frauenberger, C. and Holdrich, R., 2004. Designing a generalized sonification environment. In Proceedings of the International Conference on Auditory Display, Sydney. http://www.icad.org/websiteV2.0/Conferences/ICAD2004/posters/campo_etal.pdf, http://www.icad.org/Proceedings/2007/deCampo2007.pdf</p>
+<p>Ciuccarelli, P and Lenzi, S. 2020. Data Sonification Canvas. DOI:10.13140/RG.2.2.20307.66084</p>
+<p>De Campo, A., 2007, June. Toward a data sonification design space map. In Proceedings of the International Conference on Auditory Display (pp. 342-347).</p>
+<p>Grond, F. and Hermann, T., 2014. Interactive Sonification for Data Exploration: How listening modes and display purposes define design guidelines. Organised Sound, 19(1), pp.41-51.</p>
+<p>Emsley, I., De Roure, D. and Chamberlain, A., 2017, August. A network of noise: designing with a decade of data to sonify JANET. In Proceedings of the 12th International Audio Mostly Conference on Augmented and Participatory Sound and Music Experiences.</p>
+<p>Emsley, I., and Chamberlain, A. (2021). Sounding out the System: Multidisciplinary Web Science Platforms for Creative Sonification. Companion Publication of the 13th ACM Web Science Conference 2021.</p>
+<p>https://thealanchamberlain.bandcamp.com/track/unseen-in-sound</p>
+<p>https://austgate.co.uk/2021/06/an-introduction-to-sounding-out-the-system/</p>
+<p>Worrall, D., 2019. Sonification Design: From Data to Intelligible Soundfields. Springer Nature, Switzerland AG, Cham.</p>
+<p><a href="sonification">&lt;&lt; Previous</a>  <a href="resources">Next &gt;&gt;</a></p></div></div>
+            </div>
+        </div>
+
+        <footer class="col-md-12">
+            <hr>
+            <p>Documentation built with <a href="https://www.mkdocs.org/">MkDocs</a>.</p>
+        </footer>
+        <script src="../../js/bootstrap.bundle.min.js"></script>
+        <script>
+            var base_url = "../..",
+                shortcuts = {"help": 191, "next": 78, "previous": 80, "search": 83};
+        </script>
+        <script src="../../js/base.js"></script>
+
+        <div class="modal" id="mkdocs_keyboard_modal" tabindex="-1" role="dialog" aria-labelledby="keyboardModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="keyboardModalLabel">Keyboard Shortcuts</h4>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <table class="table">
+                <thead>
+                  <tr>
+                    <th style="width: 20%;">Keys</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td class="help shortcut"><kbd>?</kbd></td>
+                    <td>Open this help</td>
+                  </tr>
+                  <tr>
+                    <td class="next shortcut"><kbd>n</kbd></td>
+                    <td>Next page</td>
+                  </tr>
+                  <tr>
+                    <td class="prev shortcut"><kbd>p</kbd></td>
+                    <td>Previous page</td>
+                  </tr>
+                  <tr>
+                    <td class="search shortcut"><kbd>s</kbd></td>
+                    <td>Search</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="modal-footer">
+            </div>
+        </div>
+    </div>
+</div>
+
+    </body>
+</html>
