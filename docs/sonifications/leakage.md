@@ -10,21 +10,21 @@ The first effect is time stretching to alter each one second sample before it re
 
 London
 
-![type:audio](./assets/leak/london_leakage_stretched_combined.wav)
+![type:audio](../assets/leak/london_leakage_stretched_combined.wav)
 
 Thames Water Outside of London
 
-![type:audio](./assets/leak/tvhc_leakage_stretched_combined.wav)
+![type:audio](../assets/leak/tvhc_leakage_stretched_combined.wav)
 
 The second alters pitch and makes the sound like it is underwater.
 
 London
 
-![type:audio](./assets/leak/london_leakage_underwater_combined_underwater.wav)
+![type:audio](../assets/leak/london_leakage_underwater_combined_underwater.wav)
 
 Thames Water Outside of London
 
-![type:audio](./assets/leak/tvhc_leakage_underwater_combined_underwater.wav)
+![type:audio](../assets/leak/tvhc_leakage_underwater_combined_underwater.wav)
 
 The intention is to develop a more accessible musification / sonification than using abstract entities. 
 
