@@ -1,12 +1,12 @@
 ## Leakage
 
-This sonification comes from the Thames Water leakage issues. 
+This sonification comes from the Thames Water leakage issues that are in the news. 
 
-The data, hardcoded into a script, is taken from the Thames Water Annual Performance 24-25 report. 
+The data, hardcoded into a script, is taken from the [Thames Water Annual Performance 24-25](https://www.thameswater.co.uk/media-library/oxpbdjgk/thames-water-annual-performance-report-2024-25.pdf) report that appears to be latest one. Sadly, the current report for [2025/2026](https://www.thameswater.co.uk/media-library/2upd1y40/apr-2025-26.pdf) does not give the megalitres/day that was in the previous one, which is disappointing.
 
 The sonification uses two effects to alter each second of audio after a one second clean introduction. 
 
-The first effect is time stretching to alter each one second sample before it returns to the intro to end.
+The first effect is time stretching to alter each one second sample in response to the data before it returns to the intro to end.
 
 London
 
@@ -25,6 +25,8 @@ London
 Thames Water Outside of London
 
 ![type:audio](../assets/leak/tvhc_leakage_underwater_combined_underwater.wav)
+
+The murkier the sound, the greater the leakage. London does appear to have a more extreme leakage so it has a stronger set of aural changes. 
 
 The intention is to develop a more accessible musification / sonification than using abstract entities. 
 
