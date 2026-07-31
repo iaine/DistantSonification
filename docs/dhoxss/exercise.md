@@ -7,7 +7,7 @@ You have options to think about and explore. You are welcome to start in advance
 We encourage you to explore the area using the [Open Sonification](https://opensonifications.net/) principles.
 
 
-1. Design a Sonification
+### Design a Sonification
 
 You might want to use the time to design a sonification to begin thinking about some of the issues that the session will introduce.
 
@@ -15,7 +15,7 @@ This blog post from Aura Walmer regarding a [solar eclipse](https://aurawalmer.c
 
 An [alternative sonification](https://sonification.design/resource.html) toolkit by Sarah Lenzi and Paulo Ciuccarelli is available, if you would prefer.
 
-2. Sonify Data
+### Sonify Data
 
 In this option, you can create a sonification using your own data (or you can use a [sample](../assets/dhoxss.csv) from the Text Creation Partnership's (TCP) EEBO data). There are a list of [resources](resources) that will, hopefully, appeal to a wide range of interests and skill ranges. 
 
