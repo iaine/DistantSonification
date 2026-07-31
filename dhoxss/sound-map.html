@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Sound Map</title>
+
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Spectral:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  :root {
+    --paper: #ECE4D2;
+    --paper-dark: #E1D6BC;
+    --ink: #1B2B2A;
+    --ink-soft: #3D4A46;
+    --teal: #2F6E6A;
+    --teal-dark: #1F4A47;
+    --gold: #C9962C;
+    --rust: #963A28;
+    --line: #B7A87E;
+    --radius: 3px;
+    --focus: #0B5FFF;
+  }
+
+  * { box-sizing: border-box; }
+
+  html { -webkit-text-size-adjust: 100%; }
+
+  body {
+    margin: 0;
+    font-family: 'Inter', sans-serif;
+    background: var(--paper);
+    color: var(--ink);
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  /* Visible focus ring for every interactive element, keyboard users especially */
+  a:focus-visible,
+  button:focus-visible,
+  input:focus-visible,
+  [tabindex]:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+  a:focus,
+  button:focus,
+  input:focus,
+  [tabindex]:focus {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+  }
+
+  .visually-hidden {
+    position: absolute !important;
+    width: 1px; height: 1px;
+    padding: 0; margin: -1px;
+    overflow: hidden;
+    clip: rect(0,0,0,0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  .skip-link {
+    position: absolute;
+    left: -9999px;
+    top: 0;
+    z-index: 1000;
+    background: var(--teal-dark);
+    color: #fff;
+    padding: 10px 16px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    text-decoration: none;
+    border-radius: 0 0 4px 0;
+  }
+  .skip-link:focus {
+    left: 0;
+    outline: 3px solid var(--gold);
+    outline-offset: -3px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    * { transition: none !important; animation: none !important; }
+  }
+
+  .app {
+    display: grid;
+    grid-template-columns: 360px 1fr;
+    height: 100vh;
+  }
+
+  /* ---------- Sidebar ---------- */
+  .sidebar {
+    background: var(--paper);
+    border-right: 2px solid var(--line);
+    overflow-y: auto;
+    padding: 22px 20px 40px;
+  }
+
+  .brand {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .brand h1 {
+    font-family: 'Spectral', serif;
+    font-weight: 700;
+    font-size: 22px;
+    margin: 0;
+    letter-spacing: 0.2px;
+  }
+
+  .brand .mark {
+    color: var(--rust);
+    font-size: 20px;
+  }
+
+  .tagline {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin: 0 0 22px;
+  }
+
+  .card {
+    background: var(--paper-dark);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 16px 16px 18px;
+    margin-bottom: 18px;
+    position: relative;
+  }
+
+  .card::before {
+    content: attr(data-num);
+    position: absolute;
+    top: -10px;
+    left: 12px;
+    background: var(--teal);
+    color: var(--paper);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    padding: 2px 7px;
+    border-radius: 2px;
+    letter-spacing: 0.05em;
+  }
+
+  .card h2 {
+    font-family: 'Spectral', serif;
+    font-size: 15px;
+    font-weight: 600;
+    margin: 6px 0 12px;
+    color: var(--teal-dark);
+  }
+
+  label {
+    display: block;
+    font-size: 11px;
+    font-family: 'IBM Plex Mono', monospace;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--ink-soft);
+    margin-bottom: 4px;
+    margin-top: 10px;
+  }
+  label:first-of-type { margin-top: 0; }
+
+  input[type="text"],
+  input[type="number"] {
+    width: 100%;
+    padding: 8px 9px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: #FBF8F0;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 13px;
+    color: var(--ink);
+  }
+  input[type="text"]:focus,
+  input[type="number"]:focus {
+    outline: 2px solid var(--teal);
+    outline-offset: 0;
+  }
+
+  .row2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .filedrop {
+    margin-top: 10px;
+    border: 1.5px dashed var(--line);
+    border-radius: var(--radius);
+    padding: 14px 10px;
+    text-align: center;
+    background: #FBF8F0;
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    color: var(--ink-soft);
+    transition: border-color 0.15s ease;
+  }
+  .filedrop:hover, .filedrop.drag {
+    border-color: var(--teal);
+    color: var(--teal-dark);
+  }
+  .filedrop:focus-visible, .filedrop:focus {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+    border-color: var(--teal);
+  }
+  .filedrop input { display: none; }
+  .filedrop .fname {
+    display: block;
+    margin-top: 4px;
+    color: var(--ink);
+    font-weight: 600;
+    word-break: break-all;
+  }
+
+  .hint {
+    font-size: 10.5px;
+    color: var(--ink-soft);
+    margin-top: 5px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .err {
+    font-size: 11.5px;
+    color: var(--rust);
+    margin-top: 6px;
+    font-family: 'IBM Plex Mono', monospace;
+    display: none;
+  }
+
+  button {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    border: none;
+    border-radius: var(--radius);
+    cursor: pointer;
+    padding: 10px 14px;
+    min-height: 44px;
+    transition: transform 0.08s ease, background 0.15s ease;
+  }
+  button:active { transform: translateY(1px); }
+
+  input[type="text"],
+  input[type="number"] {
+    min-height: 40px;
+  }
+
+  .btn-primary {
+    background: var(--teal);
+    color: #fff;
+    width: 100%;
+    margin-top: 14px;
+  }
+  .btn-primary:hover { background: var(--teal-dark); }
+
+  .btn-secondary {
+    background: transparent;
+    color: var(--teal-dark);
+    border: 1px solid var(--teal);
+    width: 100%;
+  }
+  .btn-secondary:hover { background: var(--teal); color: #fff; }
+
+  .btn-ghost {
+    background: none;
+    border: none;
+    color: var(--rust);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 12px;
+    padding: 8px 8px;
+    min-height: 36px;
+    min-width: 36px;
+    text-decoration: underline;
+  }
+
+  /* recordings list */
+  .rec-list { list-style: none; margin: 0; padding: 0; max-height: 220px; overflow-y: auto; }
+  .rec-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 8px 0;
+    border-bottom: 1px dashed var(--line);
+    font-size: 12px;
+  }
+  .rec-item:last-child { border-bottom: none; }
+  .rec-meta { font-family: 'IBM Plex Mono', monospace; color: var(--ink-soft); font-size: 10.5px; }
+  .rec-text { font-weight: 600; margin-bottom: 2px; }
+  .empty-note {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11.5px;
+    color: var(--ink-soft);
+    font-style: italic;
+    padding: 6px 0;
+  }
+
+  footer.credit {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    color: var(--ink-soft);
+    text-align: center;
+    margin-top: 8px;
+  }
+
+  /* ---------- Map ---------- */
+  main#mapContainer {
+    height: 100vh;
+    width: 100%;
+  }
+  #map {
+    height: 100%;
+    width: 100%;
+    background: var(--paper-dark);
+  }
+  #map:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: -3px;
+  }
+
+  .leaflet-popup-content-wrapper {
+    background: #FBF8F0;
+    border-radius: var(--radius);
+    border: 1px solid var(--line);
+  }
+  .leaflet-popup-content { font-family: 'Inter', sans-serif; font-size: 13px; min-width: 180px; }
+  .popup-text { font-weight: 600; margin-bottom: 6px; color: var(--ink); }
+  .popup-coords { font-family: 'IBM Plex Mono', monospace; font-size: 11px; color: var(--ink-soft); margin-bottom: 8px; }
+  .popup-play {
+    background: var(--teal);
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    padding: 6px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .popup-play:hover { background: var(--teal-dark); }
+  .popup-play.playing { background: var(--rust); }
+
+  /* custom marker pin */
+  .sound-pin {
+    width: 26px;
+    height: 26px;
+    border-radius: 50% 50% 50% 0;
+    background: var(--rust);
+    border: 2px solid #FBF8F0;
+    transform: rotate(-45deg);
+    box-shadow: 0 1px 3px rgba(0,0,0,0.35);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .sound-pin svg { transform: rotate(45deg); width: 12px; height: 12px; fill: #fff; }
+
+  ::-webkit-scrollbar { width: 8px; }
+  ::-webkit-scrollbar-thumb { background: var(--line); border-radius: 4px; }
+
+  /* ---------- Status / live region ---------- */
+  .status-msg {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    color: var(--teal-dark);
+    background: #DDEAE4;
+    border: 1px solid var(--teal);
+    border-radius: var(--radius);
+    padding: 6px 9px;
+    margin-top: 10px;
+    display: none;
+  }
+  .status-msg.show { display: block; }
+
+  /* ---------- Responsive layout ---------- */
+  @media (max-width: 860px) {
+    html, body { height: auto; min-height: 100%; overflow: visible; }
+
+    .app {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto;
+      height: auto;
+      min-height: 100vh;
+    }
+
+    /* Map first on mobile, fixed viewport-relative height so it's usable but
+       doesn't push the form far down the page */
+    main#mapContainer {
+      order: 1;
+      height: 52vh;
+      min-height: 320px;
+    }
+
+    .sidebar {
+      order: 2;
+      border-right: none;
+      border-top: 2px solid var(--line);
+      max-height: none;
+      overflow-y: visible;
+      padding: 18px 16px 32px;
+    }
+
+    .row2 { grid-template-columns: 1fr 1fr; }
+
+    button, .filedrop { min-height: 48px; }
+  }
+
+  @media (max-width: 420px) {
+    .row2 { grid-template-columns: 1fr; gap: 8px; }
+    .brand h1 { font-size: 19px; }
+  }
+</style>
+</head>
+<body>
+
+<a class="skip-link" href="#addRecordingHeading">Skip to add-a-recording form</a>
+<a class="skip-link" href="#map">Skip to map</a>
+
+<div class="app">
+  <aside class="sidebar" aria-label="Map controls and recordings">
+    <div class="brand"><span class="mark" aria-hidden="true">&#9679;</span><h1>Field Sound Map</h1></div>
+    <p class="tagline">Pin a place. Attach a sound.</p>
+
+    <!-- Recenter card -->
+    <section class="card" data-num="01" aria-labelledby="centreHeading">
+      <h2 id="centreHeading">Map centre</h2>
+      <div class="row2">
+        <div>
+          <label for="centerLat">Latitude</label>
+          <input type="number" id="centerLat" step="any" value="51.7520" inputmode="decimal"
+                 aria-describedby="centreRangeHint" min="-90" max="90">
+        </div>
+        <div>
+          <label for="centerLng">Longitude</label>
+          <input type="number" id="centerLng" step="any" value="-1.2577" inputmode="decimal"
+                 aria-describedby="centreRangeHint" min="-180" max="180">
+        </div>
+      </div>
+      <p class="hint" id="centreRangeHint">Latitude −90 to 90, longitude −180 to 180.</p>
+      <button class="btn-secondary" id="recenterBtn" style="margin-top:12px;">Recentre map</button>
+      <p class="status-msg" id="centreStatus" role="status" aria-live="polite"></p>
+    </section>
+
+    <!-- Add marker card -->
+    <section class="card" data-num="02" aria-labelledby="addRecordingHeading">
+      <h2 id="addRecordingHeading" tabindex="-1">Add a recording</h2>
+
+      <label for="markLat">Latitude <span aria-hidden="true">*</span><span class="visually-hidden">required</span></label>
+      <div class="row2">
+        <input type="number" id="markLat" step="any" placeholder="e.g. 51.7548"
+               inputmode="decimal" required aria-required="true"
+               aria-describedby="markLatLngHint" min="-90" max="90">
+        <input type="number" id="markLng" step="any" placeholder="e.g. -1.2544"
+               inputmode="decimal" required aria-required="true"
+               aria-label="Longitude" aria-describedby="markLatLngHint" min="-180" max="180">
+      </div>
+      <p class="hint" id="markLatLngHint">Left field is latitude, right field is longitude. Tip: click anywhere on the map to fill both in automatically.</p>
+
+      <label for="markText">Text (optional)</label>
+      <input type="text" id="markText" placeholder="e.g. Radcliffe Camera bells">
+
+      <label id="audioFileLabel" for="audioFile">Audio file, max 5&nbsp;MB <span aria-hidden="true">*</span><span class="visually-hidden">required</span></label>
+      <div class="filedrop" id="filedrop" role="button" tabindex="0"
+           aria-labelledby="audioFileLabel" aria-describedby="filedropHint">
+        <span id="filedropLabel">Click, drop, or press Enter to choose an audio file</span>
+        <span class="fname" id="fileName"></span>
+        <input type="file" id="audioFile" accept="audio/*" tabindex="-1" aria-hidden="true">
+      </div>
+      <p class="hint" id="filedropHint">Accepted: any audio format, up to 5 MB.</p>
+      <p class="err" id="fileErr" role="alert"></p>
+
+      <button class="btn-primary" id="addMarkerBtn">Add marker</button>
+      <p class="err" id="formErr" role="alert"></p>
+      <p class="status-msg" id="addStatus" role="status" aria-live="polite"></p>
+    </section>
+
+    <!-- Recordings list -->
+    <section class="card" data-num="03" aria-labelledby="recordingsHeading">
+      <h2 id="recordingsHeading">Recordings (<span id="recCount">0</span>)</h2>
+      <ul class="rec-list" id="recList" aria-label="List of recordings added to the map">
+        <li class="empty-note">No recordings yet — add one above.</li>
+      </ul>
+      <button class="btn-secondary" id="downloadCsv" style="margin-top:12px;">Download CSV</button>
+      <p class="status-msg" id="csvStatus" role="status" aria-live="polite"></p>
+    </section>
+
+    <footer class="credit">Leaflet &middot; OpenStreetMap &middot; Web Audio API</footer>
+  </aside>
+
+  <main id="mapContainer" aria-label="Interactive map centred near Oxford, UK">
+    <div id="map" tabindex="-1"></div>
+  </main>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<script>
+(function () {
+  "use strict";
+
+  if (typeof L === 'undefined') {
+    document.getElementById('map').innerHTML =
+      '<div style="padding:24px;font-family:sans-serif;color:#A6432F;">' +
+      'The map library (Leaflet) failed to load from the CDN. ' +
+      'Check your internet connection or whether your network/ad-blocker is blocking ' +
+      '<code>cdnjs.cloudflare.com</code>, then reload the page.' +
+      '</div>';
+    return;
+  }
+
+  const OXFORD = { lat: 51.7520, lng: -1.2577 };
+  const MAX_BYTES = 5 * 1024 * 1024; // 5MB
+
+  // ---------- Map setup ----------
+  const map = L.map('map', { zoomControl: true }).setView([OXFORD.lat, OXFORD.lng], 14);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    maxZoom: 19,
+    attribution: '&copy; OpenStreetMap contributors'
+  }).addTo(map);
+
+  const pinIcon = L.divIcon({
+    className: '',
+    html: '<div class="sound-pin"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>',
+    iconSize: [26, 26],
+    iconAnchor: [13, 26],
+    popupAnchor: [0, -24]
+  });
+
+  // Clicking the map fills the lat/lng fields for convenience
+  map.on('click', function (e) {
+    document.getElementById('markLat').value = e.latlng.lat.toFixed(6);
+    document.getElementById('markLng').value = e.latlng.lng.toFixed(6);
+  });
+
+  // ---------- Web Audio setup ----------
+  let audioCtx = null;
+  function getCtx() {
+    if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    return audioCtx;
+  }
+
+  // ---------- State ----------
+  // recordings: {id, lat, lng, text, filename, mimeType, arrayBuffer, marker}
+  const recordings = [];
+  let pendingFile = null; // { name, type, arrayBuffer }
+  let recIdCounter = 1;
+  let currentSource = null; // currently playing AudioBufferSourceNode
+  let currentPlayBtn = null;
+
+  // ---------- Accessible status helper ----------
+  // Shows a short-lived, screen-reader-announced confirmation message
+  function announce(elId, message, isError) {
+    const el = document.getElementById(elId);
+    if (!el) return;
+    el.textContent = message;
+    el.classList.add('show');
+    if (isError) {
+      el.style.color = 'var(--rust)';
+      el.style.background = '#F3DEDA';
+      el.style.borderColor = 'var(--rust)';
+    } else {
+      el.style.color = 'var(--teal-dark)';
+      el.style.background = '#DDEAE4';
+      el.style.borderColor = 'var(--teal)';
+    }
+  }
+
+  // ---------- Recentre control ----------
+  document.getElementById('recenterBtn').addEventListener('click', function () {
+    const lat = parseFloat(document.getElementById('centerLat').value);
+    const lng = parseFloat(document.getElementById('centerLng').value);
+    if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      announce('centreStatus', 'Please enter a valid latitude (-90 to 90) and longitude (-180 to 180).', true);
+      return;
+    }
+    map.setView([lat, lng], map.getZoom());
+    announce('centreStatus', 'Map recentred to ' + lat.toFixed(4) + ', ' + lng.toFixed(4) + '.', false);
+  });
+
+  // ---------- File input handling ----------
+  const filedrop = document.getElementById('filedrop');
+  const audioFileInput = document.getElementById('audioFile');
+  const fileErr = document.getElementById('fileErr');
+  const fileNameEl = document.getElementById('fileName');
+  const filedropLabel = document.getElementById('filedropLabel');
+
+  filedrop.addEventListener('click', () => audioFileInput.click());
+  filedrop.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ' || e.key === 'Spacebar') {
+      e.preventDefault();
+      audioFileInput.click();
+    }
+  });
+  ['dragover', 'dragenter'].forEach(evt =>
+    filedrop.addEventListener(evt, e => { e.preventDefault(); filedrop.classList.add('drag'); })
+  );
+  ['dragleave', 'drop'].forEach(evt =>
+    filedrop.addEventListener(evt, e => { e.preventDefault(); filedrop.classList.remove('drag'); })
+  );
+  filedrop.addEventListener('drop', e => {
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+      handleFile(e.dataTransfer.files[0]);
+    }
+  });
+  audioFileInput.addEventListener('change', e => {
+    if (e.target.files && e.target.files[0]) handleFile(e.target.files[0]);
+  });
+
+  function setFileError(message) {
+    if (!message) {
+      fileErr.textContent = '';
+      fileErr.style.display = 'none';
+      filedrop.removeAttribute('aria-invalid');
+      return;
+    }
+    fileErr.textContent = message;
+    fileErr.style.display = 'block';
+    filedrop.setAttribute('aria-invalid', 'true');
+  }
+
+  function handleFile(file) {
+    setFileError(null);
+    pendingFile = null;
+    fileNameEl.textContent = '';
+
+    if (!file.type.startsWith('audio/')) {
+      setFileError('That file does not look like an audio file.');
+      return;
+    }
+    if (file.size > MAX_BYTES) {
+      setFileError(`File is ${(file.size / (1024*1024)).toFixed(2)} MB — the limit is 5 MB.`);
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = function () {
+      pendingFile = { name: file.name, type: file.type, arrayBuffer: reader.result };
+      fileNameEl.textContent = file.name;
+      filedropLabel.textContent = 'Selected file:';
+    };
+    reader.onerror = function () {
+      setFileError('Could not read that file — please try again.');
+    };
+    reader.readAsArrayBuffer(file);
+  }
+
+  // ---------- Add marker ----------
+  const markLatInput = document.getElementById('markLat');
+  const markLngInput = document.getElementById('markLng');
+
+  document.getElementById('addMarkerBtn').addEventListener('click', function () {
+    const formErr = document.getElementById('formErr');
+    formErr.textContent = '';
+    formErr.style.display = 'none';
+    markLatInput.removeAttribute('aria-invalid');
+    markLngInput.removeAttribute('aria-invalid');
+
+    const lat = parseFloat(markLatInput.value);
+    const lng = parseFloat(markLngInput.value);
+    const text = document.getElementById('markText').value.trim();
+
+    if (isNaN(lat) || isNaN(lng) || lat < -90 || lat > 90 || lng < -180 || lng > 180) {
+      formErr.textContent = 'Please enter a valid latitude and longitude for the marker.';
+      formErr.style.display = 'block';
+      markLatInput.setAttribute('aria-invalid', 'true');
+      markLngInput.setAttribute('aria-invalid', 'true');
+      markLatInput.focus();
+      return;
+    }
+    if (!pendingFile) {
+      formErr.textContent = 'Please choose an audio file (max 5 MB) before adding the marker.';
+      formErr.style.display = 'block';
+      filedrop.focus();
+      return;
+    }
+
+    const rec = {
+      id: recIdCounter++,
+      lat: lat,
+      lng: lng,
+      text: text,
+      filename: pendingFile.name,
+      mimeType: pendingFile.type,
+      arrayBuffer: pendingFile.arrayBuffer,
+      decoded: null,
+      marker: null
+    };
+    recordings.push(rec);
+    addMarkerToMap(rec);
+    addRecToList(rec);
+    map.panTo([lat, lng]);
+    announce('addStatus', 'Marker added at ' + lat.toFixed(4) + ', ' + lng.toFixed(4) + '. ' + recordings.length + ' recording' + (recordings.length === 1 ? '' : 's') + ' total.', false);
+
+    // reset form
+    markLatInput.value = '';
+    markLngInput.value = '';
+    document.getElementById('markText').value = '';
+    audioFileInput.value = '';
+    pendingFile = null;
+    fileNameEl.textContent = '';
+    filedropLabel.textContent = 'Click, drop, or press Enter to choose an audio file';
+    setFileError(null);
+  });
+
+  function addMarkerToMap(rec) {
+    const marker = L.marker([rec.lat, rec.lng], { icon: pinIcon }).addTo(map);
+    const popupId = 'play-btn-' + rec.id;
+    const safeText = rec.text ? escapeHtml(rec.text) : '<em>(no text)</em>';
+    const audioLabel = 'Play audio recording' + (rec.text ? ': ' + rec.text : '') + ' (' + escapeHtml(rec.filename) + ')';
+    marker.bindPopup(
+      '<div class="popup-text">' + safeText + '</div>' +
+      '<div class="popup-coords">' + rec.lat.toFixed(5) + ', ' + rec.lng.toFixed(5) + '<br>' + escapeHtml(rec.filename) + '</div>' +
+      '<button class="popup-play" id="' + popupId + '" aria-pressed="false" aria-label="' + audioLabel + '">&#9654; Play</button>'
+    );
+    marker.on('popupopen', function () {
+      const btn = document.getElementById(popupId);
+      if (btn) btn.addEventListener('click', () => togglePlay(rec, btn));
+    });
+    rec.marker = marker;
+  }
+
+  function escapeHtml(str) {
+    const div = document.createElement('div');
+    div.textContent = str;
+    return div.innerHTML;
+  }
+
+  // ---------- Web Audio playback ----------
+  function togglePlay(rec, btn) {
+    // stop whatever is currently playing
+    if (currentSource) {
+      try { currentSource.stop(); } catch (e) {}
+      currentSource = null;
+      if (currentPlayBtn) {
+        currentPlayBtn.classList.remove('playing');
+        currentPlayBtn.innerHTML = '&#9654; Play';
+        currentPlayBtn.setAttribute('aria-pressed', 'false');
+      }
+      if (currentPlayBtn === btn) { currentPlayBtn = null; return; } // was a stop click
+    }
+
+    const ctx = getCtx();
+    if (ctx.state === 'suspended') ctx.resume();
+
+    const playFromBuffer = function (buffer) {
+      const source = ctx.createBufferSource();
+      source.buffer = buffer;
+      source.connect(ctx.destination);
+      source.start(0);
+      source.onended = function () {
+        btn.classList.remove('playing');
+        btn.innerHTML = '&#9654; Play';
+        btn.setAttribute('aria-pressed', 'false');
+        if (currentSource === source) currentSource = null;
+      };
+      currentSource = source;
+      currentPlayBtn = btn;
+      btn.classList.add('playing');
+      btn.innerHTML = '&#9632; Stop';
+      btn.setAttribute('aria-pressed', 'true');
+    };
+
+    if (rec.decoded) {
+      playFromBuffer(rec.decoded);
+    } else {
+      // decodeAudioData detaches the buffer, so pass a copy and keep the original
+      ctx.decodeAudioData(rec.arrayBuffer.slice(0), function (buffer) {
+        rec.decoded = buffer;
+        playFromBuffer(buffer);
+      }, function () {
+        btn.innerHTML = '&#9654; Play';
+        btn.setAttribute('aria-pressed', 'false');
+        announce('addStatus', 'Could not decode "' + rec.filename + '" for playback. The file may be corrupted or an unsupported format.', true);
+      });
+    }
+  }
+
+  // ---------- Recordings list ----------
+  function addRecToList(rec) {
+    const list = document.getElementById('recList');
+    const emptyNote = list.querySelector('.empty-note');
+    if (emptyNote) emptyNote.remove();
+
+    const li = document.createElement('li');
+    li.className = 'rec-item';
+    const removeLabel = 'Remove recording' + (rec.text ? ': ' + rec.text : ' at ' + rec.lat.toFixed(4) + ', ' + rec.lng.toFixed(4));
+    li.innerHTML =
+      '<div>' +
+        '<div class="rec-text">' + escapeHtml(rec.text || '(no text)') + '</div>' +
+        '<div class="rec-meta">' + rec.lat.toFixed(5) + ', ' + rec.lng.toFixed(5) + ' &middot; ' + escapeHtml(rec.filename) + '</div>' +
+      '</div>' +
+      '<button class="btn-ghost" data-id="' + rec.id + '" aria-label="' + escapeHtml(removeLabel) + '">remove</button>';
+    li.querySelector('.btn-ghost').addEventListener('click', function () {
+      removeRecording(rec.id);
+    });
+    list.appendChild(li);
+    document.getElementById('recCount').textContent = recordings.length;
+  }
+
+  function removeRecording(id) {
+    const idx = recordings.findIndex(r => r.id === id);
+    if (idx === -1) return;
+    const rec = recordings[idx];
+    if (rec.marker) map.removeLayer(rec.marker);
+    recordings.splice(idx, 1);
+    document.getElementById('recCount').textContent = recordings.length;
+    refreshList();
+    announce('addStatus', 'Recording removed. ' + recordings.length + ' recording' + (recordings.length === 1 ? '' : 's') + ' remaining.', false);
+  }
+
+  function refreshList() {
+    const list = document.getElementById('recList');
+    list.innerHTML = '';
+    if (recordings.length === 0) {
+      list.innerHTML = '<li class="empty-note">No recordings yet — add one above.</li>';
+      return;
+    }
+    recordings.forEach(rec => {
+      const li = document.createElement('li');
+      li.className = 'rec-item';
+      const removeLabel = 'Remove recording' + (rec.text ? ': ' + rec.text : ' at ' + rec.lat.toFixed(4) + ', ' + rec.lng.toFixed(4));
+      li.innerHTML =
+        '<div>' +
+          '<div class="rec-text">' + escapeHtml(rec.text || '(no text)') + '</div>' +
+          '<div class="rec-meta">' + rec.lat.toFixed(5) + ', ' + rec.lng.toFixed(5) + ' &middot; ' + escapeHtml(rec.filename) + '</div>' +
+        '</div>' +
+        '<button class="btn-ghost" data-id="' + rec.id + '" aria-label="' + escapeHtml(removeLabel) + '">remove</button>';
+      li.querySelector('.btn-ghost').addEventListener('click', function () {
+        removeRecording(rec.id);
+      });
+      list.appendChild(li);
+    });
+  }
+
+  // ---------- CSV export ----------
+  document.getElementById('downloadCsv').addEventListener('click', function () {
+    if (recordings.length === 0) {
+      announce('csvStatus', 'No markers to export yet — add a recording first.', true);
+      return;
+    }
+    const rows = [['id', 'latitude', 'longitude', 'text', 'audio_filename']];
+    recordings.forEach(rec => {
+      rows.push([rec.id, rec.lat, rec.lng, rec.text || '', rec.filename]);
+    });
+    const csv = rows.map(row =>
+      row.map(csvEscape).join(',')
+    ).join('\r\n');
+
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'field-sound-map-markers.csv';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    announce('csvStatus', 'CSV file downloaded with ' + recordings.length + ' recording' + (recordings.length === 1 ? '' : 's') + '.', false);
+  });
+
+  function csvEscape(value) {
+    const str = String(value);
+    if (/[",\r\n]/.test(str)) {
+      return '"' + str.replace(/"/g, '""') + '"';
+    }
+    return str;
+  }
+
+})();
+</script>
+</body>
+</html>

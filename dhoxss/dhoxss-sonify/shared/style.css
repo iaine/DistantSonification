@@ -1,0 +1,408 @@
+/* ==========================================================================
+   Early English Books — Sonic Register
+   Shared design tokens & components across the three archive tools.
+   ========================================================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;0,700;1,500&family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500;600&display=swap');
+
+:root{
+  /* -- palette: card-catalogue / letterpress ---------------------------- */
+  --paper:      #ece7d6;   /* aged card stock */
+  --paper-dim:  #ddd6bd;   /* recessed paper (wells, tracks) */
+  --card:       #f4f0e2;   /* raised card surface */
+  --ink:        #1b2a22;   /* iron-gall, faded to bottle-green-black */
+  --ink-soft:   #3c4a3f;   /* secondary ink */
+  --rule:       #b9ae8d;   /* faded rule lines / borders */
+  --rule-soft:  #d2c9a8;
+  --red:        #8b2e1f;   /* wax-seal red — primary accent / active state */
+  --red-dim:    #b06450;
+  --gold:       #a9862f;   /* brass / gilt — secondary accent */
+  --wood:       #0f1710;   /* drawer / cabinet shadow */
+  --wood-2:     #182018;
+
+  --font-display: 'Cormorant Garamond', 'Times New Roman', serif;
+  --font-body:    'Spectral', Georgia, serif;
+  --font-mono:    'IBM Plex Mono', ui-monospace, monospace;
+
+  --radius: 3px;
+  --shadow-card: 0 1px 0 rgba(255,255,255,0.5) inset, 0 10px 24px rgba(15,23,16,0.35);
+}
+
+*, *::before, *::after{ box-sizing: border-box; }
+
+html, body{
+  margin:0; padding:0;
+  background:
+    radial-gradient(ellipse at 20% -10%, #24301f 0%, transparent 55%),
+    linear-gradient(180deg, var(--wood-2) 0%, var(--wood) 100%);
+  color: var(--ink);
+  font-family: var(--font-body);
+  min-height: 100vh;
+}
+
+body{
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.05) 0px, rgba(0,0,0,0.05) 1px, transparent 1px, transparent 3px),
+    radial-gradient(ellipse at 20% -10%, #24301f 0%, transparent 55%),
+    linear-gradient(180deg, var(--wood-2) 0%, var(--wood) 100%);
+}
+
+a{ color: var(--red); }
+
+/* -- drawer label / masthead ------------------------------------------- */
+.masthead{
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 2.6rem 1.5rem 1rem;
+  color: var(--paper);
+}
+.masthead .eyebrow{
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  display:flex;
+  align-items:center;
+  gap: 0.6em;
+}
+.masthead .eyebrow::before{
+  content:'';
+  width: 22px; height: 1px; background: var(--gold);
+  display:inline-block;
+}
+.masthead h1{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: clamp(2rem, 4.5vw, 3.1rem);
+  margin: 0.25em 0 0.15em;
+  letter-spacing: 0.01em;
+}
+.masthead p.lede{
+  font-family: var(--font-body);
+  font-style: italic;
+  color: #cfc7a9;
+  max-width: 62ch;
+  line-height: 1.5;
+  margin: 0.2em 0 0;
+}
+.masthead nav{
+  margin-top: 1.4rem;
+  display:flex; gap: 1.4rem; flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.masthead nav a{
+  color: #cfc7a9;
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  padding-bottom: 3px;
+}
+.masthead nav a:hover, .masthead nav a.current{
+  color: var(--paper);
+  border-bottom-color: var(--red);
+}
+
+/* -- the "card" panel that holds each tool ------------------------------ */
+.card{
+  max-width: 1080px;
+  margin: 0 auto 3rem;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  border: 1px solid #cfc4a0;
+  position: relative;
+  overflow: hidden;
+}
+.card::before{
+  /* punch-hole, catalogue-card detail */
+  content:'';
+  position:absolute; top:14px; left:14px;
+  width:9px; height:9px; border-radius:50%;
+  background: var(--wood);
+  box-shadow: inset 0 1px 2px rgba(0,0,0,0.6);
+}
+.card-inner{ padding: 2rem 2.2rem 2.4rem; }
+
+.card-tab{
+  display:flex; align-items:center; justify-content:space-between;
+  gap: 1rem;
+  padding: 0.9rem 2.2rem;
+  border-bottom: 1px solid var(--rule);
+  background: linear-gradient(180deg, #f7f3e7, #efe9d7);
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+}
+.card-tab .tag-no{ color: var(--red); font-weight: 600; }
+
+h2.tool-title{
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 1.9rem;
+  margin: 0 0 0.2rem;
+  color: var(--ink);
+}
+p.tool-desc{
+  color: var(--ink-soft);
+  max-width: 68ch;
+  line-height: 1.55;
+  margin: 0 0 1.6rem;
+}
+
+/* -- upload well ---------------------------------------------------------*/
+.upload-well{
+  border: 1.5px dashed var(--rule);
+  border-radius: var(--radius);
+  background: var(--paper-dim);
+  padding: 1.1rem 1.3rem;
+  display:flex;
+  align-items:center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.6rem;
+  transition: border-color .15s ease, background .15s ease;
+}
+.upload-well.drag{
+  border-color: var(--red);
+  background: #efe4d3;
+}
+.upload-well .u-left{
+  display:flex; align-items:center; gap: 0.9rem;
+}
+.upload-well .u-icon{
+  width: 34px; height: 34px;
+  border: 1px solid var(--rule);
+  border-radius: 50%;
+  display:flex; align-items:center; justify-content:center;
+  color: var(--red);
+  font-family: var(--font-display);
+  font-weight:700;
+  background: var(--card);
+  flex: none;
+}
+.upload-well .u-text .u-title{
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  color: var(--ink);
+}
+.upload-well .u-text .u-sub{
+  font-size: 0.8rem;
+  color: var(--ink-soft);
+  margin-top: 2px;
+}
+.upload-well input[type=file]{ display:none; }
+
+.btn{
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--paper);
+  padding: 0.62em 1.1em;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease, transform .05s ease;
+  white-space: nowrap;
+}
+.btn:hover{ background: var(--red); border-color: var(--red); }
+.btn:active{ transform: translateY(1px); }
+.btn.ghost{
+  background: transparent;
+  color: var(--ink);
+  border-color: var(--rule);
+}
+.btn.ghost:hover{ background: var(--paper); color: var(--red); border-color: var(--red); }
+.btn:disabled{ opacity: 0.4; cursor: not-allowed; }
+.btn:disabled:hover{ background: var(--ink); border-color: var(--ink); }
+
+.btn-row{ display:flex; gap: 0.6rem; flex-wrap: wrap; align-items:center; }
+
+/* -- status / meta strip --------------------------------------------------*/
+.meta-strip{
+  display:flex; gap: 1.6rem; flex-wrap: wrap;
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--ink-soft);
+  margin: 0.9rem 0 1.4rem;
+  padding-top: 0.8rem;
+  border-top: 1px dotted var(--rule);
+}
+.meta-strip b{ color: var(--ink); }
+
+/* -- controls grid ---------------------------------------------------------*/
+.controls{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem 1.4rem;
+  padding: 1.1rem 1.3rem;
+  background: var(--paper-dim);
+  border-radius: var(--radius);
+  margin-bottom: 1.4rem;
+  border: 1px solid var(--rule-soft);
+}
+.field label{
+  display:block;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--ink-soft);
+  margin-bottom: 0.4rem;
+}
+.field select, .field input[type=number], .field input[type=text]{
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  padding: 0.44em 0.55em;
+  border: 1px solid var(--rule);
+  border-radius: 2px;
+  background: var(--card);
+  color: var(--ink);
+}
+.field input[type=range]{
+  width: 100%;
+  accent-color: var(--red);
+}
+.field .val{
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--red);
+}
+
+/* -- chart mount ---------------------------------------------------------*/
+.chart-wrap{
+  background: var(--card);
+  border: 1px solid var(--rule-soft);
+  border-radius: var(--radius);
+  padding: 0.6rem 0.6rem 0;
+  margin-bottom: 1.2rem;
+}
+
+/* -- playhead / needle ----------------------------------------------------*/
+.transport{
+  display:flex; align-items:center; gap: 1rem; flex-wrap: wrap;
+  margin-bottom: 0.4rem;
+}
+.needle-strip{
+  flex: 1 1 220px;
+  height: 34px;
+  position: relative;
+  background:
+    repeating-linear-gradient(90deg, var(--rule) 0 1px, transparent 1px 8%);
+  border-bottom: 1px solid var(--rule);
+}
+.needle{
+  position:absolute; top:0; bottom:0; left:0;
+  width: 2px;
+  background: var(--red);
+  box-shadow: 0 0 6px rgba(139,46,31,0.7);
+  transition: left 0.05s linear;
+}
+
+footer.byline{
+  text-align:center;
+  color: #a89a76;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.06em;
+  padding: 1rem 1rem 2.4rem;
+}
+
+/* -- small helpers ---------------------------------------------------------*/
+.hidden{ display:none !important; }
+.hint{ font-size: 0.78rem; color: var(--ink-soft); }
+.errbox{
+  border:1px solid var(--red);
+  background: #f6e3dd;
+  color: var(--red);
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+  margin-bottom: 1rem;
+  font-family: var(--font-mono);
+}
+
+table.datatable{
+  width: 100%;
+  border-collapse: collapse;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+}
+table.datatable th, table.datatable td{
+  text-align:left;
+  padding: 0.4em 0.6em;
+  border-bottom: 1px solid var(--rule-soft);
+}
+table.datatable th{
+  color: var(--ink-soft);
+  text-transform: uppercase;
+  font-size: 0.66rem;
+  letter-spacing: 0.06em;
+}
+table.datatable input{
+  width: 8em;
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  padding: 0.2em 0.35em;
+  border: 1px solid var(--rule);
+  background: var(--card);
+}
+
+/* -- landing index grid ----------------------------------------------------*/
+.tool-grid{
+  display:grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.4rem;
+  max-width: 1080px;
+  margin: 0 auto 3rem;
+  padding: 0 1.5rem;
+}
+.tool-card{
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-card);
+  border: 1px solid #cfc4a0;
+  padding: 1.6rem 1.6rem 1.8rem;
+  text-decoration: none;
+  color: var(--ink);
+  display:flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  position: relative;
+  transition: transform .15s ease;
+}
+.tool-card:hover{ transform: translateY(-3px); }
+.tool-card .num{
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--red);
+  letter-spacing: 0.1em;
+}
+.tool-card h3{
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  margin: 0;
+}
+.tool-card p{
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin: 0;
+}
+.tool-card .go{
+  margin-top: auto;
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--red);
+}

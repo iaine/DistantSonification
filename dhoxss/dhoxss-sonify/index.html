@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sonic Register — Early English Books, heard</title>
+<link rel="stylesheet" href="shared/style.css">
+<style>
+  .intro-note{
+    max-width: 1080px; margin: 0 auto 1.2rem; padding: 0 1.5rem;
+    color: #cfc7a9; font-family: var(--font-mono); font-size: 0.78rem;
+    line-height: 1.6; letter-spacing: 0.01em;
+  }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="eyebrow">Digital Humanities Oxford Summer School &middot; STC / EEBO-TCP catalogue</div>
+  <h1>The Sonic Register</h1>
+  <p class="lede">Three small instruments for listening to a catalogue of early
+    printed books — each takes the same CSV export (date, place, page-count,
+    subject terms) and turns one dimension of it into sound.</p>
+  <nav>
+    <a href="index.html" class="current">Index</a>
+    <a href="timeline/index.html">I. Timeline</a>
+    <a href="map/index.html">II. Distance</a>
+    <a href="tags/index.html">III. Terms</a>
+  </nav>
+</header>
+
+<p class="intro-note">Built with Highcharts and the Web Audio API — no
+  frameworks, nothing leaves your browser. Upload your own export in the
+  same shape as the sample (columns: <em>Date, Pages, Place, Terms</em>,
+  among others), or load the bundled sample of 199 STC/EEBO records to try
+  each tool straight away.</p>
+
+<section class="tool-grid">
+
+  <a class="tool-card" href="timeline/index.html">
+    <span class="num">I</span>
+    <h3>Timeline &amp; Tone</h3>
+    <p>Every year in the catalogue becomes a note. Pitch tracks either the
+      number of editions or the total pages printed that year — press play
+      and hear four centuries of the press rise and fall.</p>
+    <span class="go">Open the timeline →</span>
+  </a>
+
+  <a class="tool-card" href="map/index.html">
+    <span class="num">II</span>
+    <h3>Distance from Home</h3>
+    <p>Places of publication plotted on a map of Britain. A chronological
+      playback sounds each year again, but now volume falls away with
+      distance from a reference point you set — Oxford by default.</p>
+    <span class="go">Open the map →</span>
+  </a>
+
+  <a class="tool-card" href="tags/index.html">
+    <span class="num">III</span>
+    <h3>Subject Cloud</h3>
+    <p>Subject terms, split on their semicolons, sized by frequency. Click
+      a term and hear its associated titles played back as a short
+      arpeggiated phrase.</p>
+    <span class="go">Open the cloud →</span>
+  </a>
+
+</section>
+
+<footer class="byline">Sonic Register — a set of listening instruments for archival metadata</footer>
+
+</body>
+</html>

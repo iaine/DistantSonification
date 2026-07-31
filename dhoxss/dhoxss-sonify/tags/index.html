@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>III. Subject Cloud — Sonic Register</title>
+<link rel="stylesheet" href="../shared/style.css">
+<script src="https://code.highcharts.com/highcharts.js"></script>
+<script src="https://code.highcharts.com/modules/wordcloud.js"></script>
+<style>
+  #cloud{ height: 440px; cursor: default; }
+  .now-playing{
+    font-family: var(--font-mono); font-size: 0.8rem; color: var(--red);
+    min-height: 1.4em; margin-bottom: 0.6rem;
+  }
+  .titles-wrap{ max-height: 260px; overflow:auto; border:1px solid var(--rule-soft); border-radius: var(--radius); }
+</style>
+</head>
+<body>
+
+<header class="masthead">
+  <div class="eyebrow">Digital Humanities Oxford Summer School &middot; STC / EEBO-TCP catalogue</div>
+  <h1>The Sonic Register</h1>
+  <p class="lede">Click a subject term to hear the books gathered under it.</p>
+  <nav>
+    <a href="../index.html">Index</a>
+    <a href="../timeline/index.html">I. Timeline</a>
+    <a href="../map/index.html">II. Distance</a>
+    <a href="../tags/index.html" class="current">III. Terms</a>
+  </nav>
+</header>
+
+<div class="card">
+  <div class="card-tab"><span><span class="tag-no">No. III</span> — Subject Cloud</span><span>terms (;-split) → cloud · click → arpeggio</span></div>
+  <div class="card-inner">
+
+    <h2 class="tool-title">Subject Cloud</h2>
+    <p class="tool-desc">The <em>Terms</em> column is split on its semicolons
+      into individual subject headings, sized here by how often each one
+      appears. Click any term to play its associated records as a short
+      rising phrase — one note per book, ordered by year, pitched by page
+      count — and to list the titles beneath.</p>
+
+    <div id="err" class="errbox hidden"></div>
+
+    <div class="upload-well" id="dropZone">
+      <div class="u-left">
+        <div class="u-icon">＋</div>
+        <div class="u-text">
+          <div class="u-title">Upload a catalogue CSV</div>
+          <div class="u-sub">Needs a <em>Terms</em> column (semicolon-separated) &middot; drag &amp; drop or browse</div>
+        </div>
+      </div>
+      <div class="btn-row">
+        <button class="btn ghost" id="sampleBtn">Load sample (STC/EEBO, 199 records)</button>
+        <button class="btn" id="browseBtn">Browse file…</button>
+        <input type="file" id="fileInput" accept=".csv,text/csv">
+      </div>
+    </div>
+
+    <div class="meta-strip hidden" id="metaStrip"></div>
+
+    <div class="controls hidden" id="controls">
+      <div class="field">
+        <label for="waveSel">Waveform</label>
+        <select id="waveSel">
+          <option value="triangle">Triangle</option>
+          <option value="sine">Sine</option>
+          <option value="sawtooth">Sawtooth</option>
+          <option value="square">Square</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="pitchBySel">Pitch driven by</label>
+        <select id="pitchBySel">
+          <option value="pages">Page count</option>
+          <option value="year">Publication year</option>
+          <option value="order">Order of appearance</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="tempoRange">Note spacing — <span class="val" id="tempoVal">220 ms</span></label>
+        <input type="range" id="tempoRange" min="60" max="600" step="10" value="220">
+      </div>
+      <div class="field">
+        <label for="minFreq">Lowest note (Hz)</label>
+        <input type="number" id="minFreq" value="196" min="40" max="2000">
+      </div>
+      <div class="field">
+        <label for="maxFreq">Highest note (Hz)</label>
+        <input type="number" id="maxFreq" value="988" min="40" max="4000">
+      </div>
+    </div>
+
+    <div class="chart-wrap hidden" id="chartWrap">
+      <div id="cloud"></div>
+    </div>
+
+    <div class="hidden" id="resultZone">
+      <div class="now-playing" id="nowPlaying">—</div>
+      <div class="btn-row" style="margin-bottom:0.8rem;">
+        <button class="btn ghost" id="replayBtn">▶ Replay term</button>
+        <button class="btn ghost" id="stopBtn">■ Stop</button>
+      </div>
+      <div class="titles-wrap">
+        <table class="datatable" id="titlesTable">
+          <thead><tr><th>Year</th><th>Title</th><th>Author</th><th>Pages</th></tr></thead>
+          <tbody id="titlesBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<footer class="byline">Sonic Register — III. Subject Cloud</footer>
+
+<script src="../shared/sample-data.js"></script>
+<script src="../shared/common.js"></script>
+<script src="tags.js"></script>
+</body>
+</html>
